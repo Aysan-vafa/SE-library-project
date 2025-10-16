@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,20 +26,6 @@ public class StudentManager {
                 .findFirst()
                 .orElse(null);
     }
-
-    public void displayStudents() {
-        System.out.println("\n--- List of Registered Students ---");
-
-        if (students.isEmpty()) {
-            System.out.println("No students have registered yet.");
-            return;
-        }
-
-        for (Student student : students) {
-            System.out.println(student);
-        }
-    }
-
 
     private boolean isUsernameTaken(String username) {
         return students.stream().anyMatch(s -> s.getUsername().equals(username));

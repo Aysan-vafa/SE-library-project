@@ -1,9 +1,12 @@
+
 public class LibrarySystem {
     private StudentManager studentManager;
+    private BookManager bookManager;
     private MenuHandler menuHandler;
 
     public LibrarySystem() {
         this.studentManager = new StudentManager();
+        this.bookManager = new BookManager();
         this.menuHandler = new MenuHandler(this);
     }
 
@@ -33,6 +36,10 @@ public class LibrarySystem {
 
     public void displayAvailableBooks() {
         System.out.println("Not implemented.");
+    }
+
+    public BookManager getBookManager() {
+        return bookManager;
     }
 
     public void start() {

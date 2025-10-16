@@ -1,4 +1,7 @@
+
+import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class MenuHandler {
     private Scanner scanner;
@@ -20,7 +23,7 @@ public class MenuHandler {
             System.out.println("4. Exit");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 5);
+            int choice = getIntInput(1, 4);
 
             switch (choice) {
                 case 1:
@@ -92,10 +95,11 @@ public class MenuHandler {
             System.out.println("3. Borrow a Book");
             System.out.println("4. Return a Book");
             System.out.println("5. View Available Books");
-            System.out.println("6. Logout");
+            System.out.println("6. Search Books");
+            System.out.println("7. Logout");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 6);
+            int choice = getIntInput(1, 7);
 
             switch (choice) {
                 case 1:
@@ -115,11 +119,44 @@ public class MenuHandler {
                     librarySystem.displayAvailableBooks();
                     break;
                 case 6:
+                    handleSearchBooks();
+                    break;
+                case 7:
                     currentUser = null;
                     System.out.println("Logged out successfully.");
                     return;
                 default:
                     System.out.println("Invalid option! Please try again.");
+            }
+        }
+    }
+
+    private void handleSearchBooks() {
+        System.out.println("\n--- Search Books ---");
+        System.out.print("Title (press Enter to skip): ");
+        String title = scanner.nextLine();
+
+        System.out.print("Author (press Enter to skip): ");
+        String author = scanner.nextLine();
+
+        System.out.print("Publish Year (press Enter to skip): ");
+        String yearInput = scanner.nextLine();
+        Integer year = null;
+        if (!yearInput.isEmpty()) {
+            try {
+                year = Integer.parseInt(yearInput);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid year, ignored.");
+            }
+        }
+
+        List<Book> results = librarySystem.getBookManager().searchBooks(title, author, year);
+        if (results.isEmpty()) {
+            System.out.println("No books found.");
+        } else {
+            System.out.println("\n--- Search Results ---");
+            for (Book b : results) {
+                System.out.println(b);
             }
         }
     }
