@@ -51,6 +51,19 @@ public class LoanManager {
         saveLoans();
         System.out.println("Loan request created successfully and is waiting for approval.");
     }
+    public int getLoanCount() {
+        return loans.size();
+    }
+
+    public int getActiveLoanCount() {
+        int count = 0;
+        for (BookLoan loan : loans) {
+            if (loan.isApproved() && !bookManager.findById(loan.getBookId()).isBorrowed()) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     private void loadLoans() {
         File file = new File(LOAN_FILE);

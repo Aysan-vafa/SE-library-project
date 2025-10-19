@@ -173,4 +173,29 @@ public class MenuHandler {
             }
         }
     }
+
+    private void displayGuestMenu() {
+        System.out.println("\n=== Guest Menu ===");
+        System.out.println("1. View total registered students");
+        System.out.println("2. View library statistics");
+        System.out.println("3. Search books by title");
+        System.out.println("4. Back to main menu");
+        System.out.print("Please enter your choice: ");
+
+        int choice = getIntInput(1, 4);
+        switch (choice) {
+            case 1:
+                System.out.println("Total registered students: " + librarySystem.getStudentCount());
+                break;
+            case 2:
+                librarySystem.displayGuestStatistics();
+                break;
+            case 3:
+                handleSearchBooks();
+                break;
+            case 4:
+                return;
+        }
+    }
+
 }

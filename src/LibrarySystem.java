@@ -53,6 +53,20 @@ public class LibrarySystem {
         }
     }
 
+    public void displayGuestStatistics() {
+        int totalStudents = studentManager.getStudentCount();
+        int totalBooks = bookManager.getAllBooks().size();
+        int totalLoans = (loanManager != null) ? loanManager.getLoanCount() : 0;
+        int borrowedBooks = (loanManager != null) ? loanManager.getActiveLoanCount() : 0;
+
+        System.out.println("\n--- Library Statistics ---");
+        System.out.println("Total registered students: " + totalStudents);
+        System.out.println("Total books: " + totalBooks);
+        System.out.println("Total loans: " + totalLoans);
+        System.out.println("Currently borrowed books: " + borrowedBooks);
+    }
+
+
     public BookManager getBookManager() {
         return bookManager;
     }
