@@ -1,7 +1,6 @@
 
 import java.util.List;
 import java.util.Scanner;
-import java.util.UUID;
 
 public class MenuHandler {
     private Scanner scanner;

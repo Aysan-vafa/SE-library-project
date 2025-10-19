@@ -1,0 +1,92 @@
+import java.io.*;
+import java.time.LocalDate;
+import java.util.*;
+
+public class LoanManager {
+    private List<BookLoan> loans;
+    private BookManager bookManager;
+    private static final String LOAN_FILE = "loans.txt";
+    private Scanner scanner;
+
+    public LoanManager(BookManager bookManager) {
+        this.bookManager = bookManager;
+        this.loans = new ArrayList<>();
+        this.scanner = new Scanner(System.in);
+        loadLoans();
+    }
+
+    public void createLoanRequest(Student student) {
+        System.out.println("\n--- Create Loan Request ---");
+
+        List<Book> allBooks = bookManager.getAllBooks();
+        if (allBooks.isEmpty()) {
+            System.out.println("No books available in the system.");
+            return;
+        }
+
+
+        System.out.println("Available Books:");
+        for (int i = 0; i < allBooks.size(); i++) {
+            System.out.println((i + 1) + ". " + allBooks.get(i));
+        }
+
+        System.out.print("Select book number: ");
+        int bookIndex = getIntInput(1, allBooks.size()) - 1;
+        Book selectedBook = allBooks.get(bookIndex);
+
+        if (selectedBook.isBorrowed()) {
+            System.out.println("Sorry, this book is already borrowed.");
+            return;
+        }
+
+        System.out.print("Start Date (yyyy-MM-dd): ");
+        String startDate = scanner.nextLine();
+
+        System.out.print("End Date (yyyy-MM-dd): ");
+        String endDate = scanner.nextLine();
+
+        String loanId = UUID.randomUUID().toString();
+        BookLoan loan = new BookLoan(loanId, student.getUsername(), selectedBook.getId(), startDate, endDate, false);
+        loans.add(loan);
+        saveLoans();
+        System.out.println("Loan request created successfully and is waiting for approval.");
+    }
+
+    private void loadLoans() {
+        File file = new File(LOAN_FILE);
+        if (!file.exists()) return;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                BookLoan loan = BookLoan.fromFileString(line);
+                if (loan != null) loans.add(loan);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveLoans() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(LOAN_FILE))) {
+            for (BookLoan loan : loans) {
+                pw.println(loan.toFileString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int getIntInput(int min, int max) {
+        while (true) {
+            try {
+                int input = Integer.parseInt(scanner.nextLine());
+                if (input >= min && input <= max) {
+                    return input;
+                }
+                System.out.printf("Please enter a number between %d and %d: ", min, max);
+            } catch (NumberFormatException e) {
+                System.out.print("Invalid input. Please enter a number: ");
+            }
+        }
+    }
+}
