@@ -5,11 +5,11 @@ import java.util.List;
 
 public class StudentManager {
     private List<Student> students;
-    private static final String FILE_NAME = "students.txt";
+    private static final String FILE_NAME = "students";
 
     public StudentManager() {
         this.students = new ArrayList<>();
-        loadStudentsFromFile();
+        loadStudents();
     }
 
     public void registerStudent(String name, String studentId, String username, String password) {
@@ -18,17 +18,23 @@ public class StudentManager {
             return;
         }
 
-        Student newStudent = new Student(name, studentId, username, password);
+        Student newStudent = new Student(name, studentId, username, password, true);
         students.add(newStudent);
-        saveStudentsToFile();
+        saveStudents();
         System.out.println("Student registration completed successfully.");
     }
 
     public Student authenticateStudent(String username, String password) {
-        return students.stream()
-                .filter(s -> s.getUsername().equals(username) && s.getPassword().equals(password))
-                .findFirst()
-                .orElse(null);
+        for (Student s : students) {
+            if (s.getUsername().equals(username) && s.getPassword().equals(password)) {
+                if (!s.isActive()) {
+                    System.out.println("Your account is deactivated. Please contact the library.");
+                    return null;
+                }
+                return s;
+            }
+        }
+        return null;
     }
 
     public void displayStudents() {
@@ -52,40 +58,40 @@ public class StudentManager {
         return students.size();
     }
 
+    public Student findByUsername(String username) {
+        return students.stream()
+                .filter(s -> s.getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
+    }
 
-    private void saveStudentsToFile() {
+    public void saveStudents() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
             for (Student s : students) {
-                String line = s.getName() + "," + s.getStudentId() + "," + s.getUsername() + "," + s.getPassword();
-                writer.write(line);
+                writer.write(s.toFileString());
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error saving students to file: " + e.getMessage());
+            System.out.println("Error saving students: " + e.getMessage());
         }
     }
 
-    private void loadStudentsFromFile() {
+    private void loadStudents() {
         File file = new File(FILE_NAME);
         if (!file.exists()) {
             return;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 4) {
-                    String name = parts[0];
-                    String studentId = parts[1];
-                    String username = parts[2];
-                    String password = parts[3];
-                    Student s = new Student(name, studentId, username, password);
+                Student s = Student.fromFileString(line);
+                if (s != null) {
                     students.add(s);
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error loading students from file: " + e.getMessage());
+            System.out.println("Error loading students: " + e.getMessage());
         }
     }
 }
