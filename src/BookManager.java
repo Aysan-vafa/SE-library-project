@@ -1,12 +1,15 @@
+
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class BookManager {
     private List<Book> books;
-    private static final String BOOK_FILE = "books";
+    private static final String BOOK_FILE = "books.txt";
 
     public BookManager() {
-        books = new ArrayList<>();
+        this.books = new ArrayList<>();
         loadBooks();
     }
 
@@ -15,14 +18,25 @@ public class BookManager {
         saveBooks();
     }
 
+
+    public Book createBook(String title, String author, int publishYear) {
+        String id = UUID.randomUUID().toString();
+        Book b = new Book(id, title, author, publishYear, false);
+        addBook(b);
+        return b;
+    }
+
+
     public List<Book> searchBooks(String title, String author, Integer year) {
         List<Book> results = new ArrayList<>();
         for (Book book : books) {
             boolean match = true;
-            if (title != null && !title.isEmpty() && !book.getTitle().toLowerCase().contains(title.toLowerCase())) {
+            if (title != null && !title.trim().isEmpty() &&
+                    !book.getTitle().toLowerCase().contains(title.toLowerCase())) {
                 match = false;
             }
-            if (author != null && !author.isEmpty() && !book.getAuthor().toLowerCase().contains(author.toLowerCase())) {
+            if (author != null && !author.trim().isEmpty() &&
+                    !book.getAuthor().toLowerCase().contains(author.toLowerCase())) {
                 match = false;
             }
             if (year != null && book.getPublishYear() != year) {
@@ -33,31 +47,47 @@ public class BookManager {
         return results;
     }
 
+    public List<Book> getAllBooks() {
+        return books;
+    }
+
+    public Book findById(String id) {
+        for (Book b : books) {
+            if (b.getId().equals(id)) return b;
+        }
+        return null;
+    }
+
+    public void saveBooks() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(BOOK_FILE))) {
+            for (Book b : books) {
+                pw.println(b.toFileString());
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving books: " + e.getMessage());
+        }
+    }
+
     private void loadBooks() {
         File file = new File(BOOK_FILE);
-        if (!file.exists()) return;
+        if (!file.exists()) {
+            return;
+        }
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
-                Book book = Book.fromFileString(line);
-                if (book != null) books.add(book);
+                Book b = Book.fromFileString(line);
+                if (b != null) books.add(b);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error loading books: " + e.getMessage());
         }
     }
 
-    private void saveBooks() {
-        try (PrintWriter pw = new PrintWriter(new FileWriter(BOOK_FILE))) {
-            for (Book book : books) {
-                pw.println(book.toFileString());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
-    public List<Book> getAllBooks() {
-        return books;
+    public void updateBook(Book book) {
+        // in this simple list-backed manager, objects are the same references;
+        // just persist to disk
+        saveBooks();
     }
 }

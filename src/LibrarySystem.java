@@ -2,11 +2,19 @@
 public class LibrarySystem {
     private StudentManager studentManager;
     private BookManager bookManager;
+    private LoanManager loanManager;
     private MenuHandler menuHandler;
 
     public LibrarySystem() {
         this.studentManager = new StudentManager();
         this.bookManager = new BookManager();
+
+        try {
+            this.loanManager = new LoanManager(this.bookManager);
+        } catch (Exception e) {
+
+            this.loanManager = null;
+        }
         this.menuHandler = new MenuHandler(this);
     }
 
@@ -27,7 +35,11 @@ public class LibrarySystem {
     }
 
     public void borrowBook(Student student) {
-        System.out.println("Not implemented.");
+        if (loanManager != null) {
+            loanManager.createLoanRequest(student);
+        } else {
+            System.out.println("Loan functionality not available.");
+        }
     }
 
     public void returnBook(Student student) {
@@ -35,11 +47,22 @@ public class LibrarySystem {
     }
 
     public void displayAvailableBooks() {
-        System.out.println("Not implemented.");
+        System.out.println("\n--- All Books ---");
+        for (Book b : bookManager.getAllBooks()) {
+            System.out.println(b);
+        }
     }
 
     public BookManager getBookManager() {
         return bookManager;
+    }
+
+    public StudentManager getStudentManager() {
+        return studentManager;
+    }
+
+    public LoanManager getLoanManager() {
+        return loanManager;
     }
 
     public void start() {

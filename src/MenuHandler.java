@@ -94,7 +94,7 @@ public class MenuHandler {
             System.out.println("3. Borrow a Book");
             System.out.println("4. Return a Book");
             System.out.println("5. View Available Books");
-            System.out.println("6. Search Books");
+            System.out.println("6. Search Books"); // added in FPR_1-3
             System.out.println("7. Logout");
             System.out.print("Please enter your choice: ");
 
@@ -150,7 +150,7 @@ public class MenuHandler {
         }
 
         List<Book> results = librarySystem.getBookManager().searchBooks(title, author, year);
-        if (results.isEmpty()) {
+        if (results == null || results.isEmpty()) {
             System.out.println("No books found.");
         } else {
             System.out.println("\n--- Search Results ---");

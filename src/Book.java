@@ -14,6 +14,11 @@ public class Book {
         this.isBorrowed = isBorrowed;
     }
 
+
+    public Book(String id, String title, String author, int publishYear) {
+        this(id, title, author, publishYear, false);
+    }
+
     public String getId() {
         return id;
     }
@@ -48,18 +53,33 @@ public class Book {
     }
 
     public String toFileString() {
-        return id + ";" + title + ";" + author + ";" + publishYear + ";" + isBorrowed;
+
+        return id + ";" + escapeSemi(title) + ";" + escapeSemi(author) + ";" + publishYear + ";" + isBorrowed;
     }
 
     public static Book fromFileString(String line) {
+        if (line == null || line.trim().isEmpty()) return null;
         String[] parts = line.split(";");
         if (parts.length != 5) return null;
-        return new Book(
-                parts[0],
-                parts[1],
-                parts[2],
-                Integer.parseInt(parts[3]),
-                Boolean.parseBoolean(parts[4])
-        );
+        try {
+            String id = parts[0];
+            String title = unescapeSemi(parts[1]);
+            String author = unescapeSemi(parts[2]);
+            int year = Integer.parseInt(parts[3]);
+            boolean borrowed = Boolean.parseBoolean(parts[4]);
+            return new Book(id, title, author, year, borrowed);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static String escapeSemi(String s) {
+        if (s == null) return "";
+        return s.replace(";", "\\;");
+    }
+
+    private static String unescapeSemi(String s) {
+        if (s == null) return "";
+        return s.replace("\\;", ";");
     }
 }
