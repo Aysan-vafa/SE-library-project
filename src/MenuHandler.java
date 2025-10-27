@@ -198,4 +198,25 @@ public class MenuHandler {
         }
     }
 
+
+    private void handleEmployeeLogin() {
+        System.out.println("\n--- Employee Login ---");
+
+        System.out.print("Username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+
+        Employee emp = librarySystem.getEmployeeManager().authenticate(username, password);
+        if (emp != null) {
+            System.out.println("Login successful! Welcome, " + emp.getName());
+            displayEmployeeMenu(emp);
+        } else {
+            System.out.println("Invalid username or password.");
+        }
+    }
+
+
+
 }

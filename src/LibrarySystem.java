@@ -4,6 +4,7 @@ public class LibrarySystem {
     private BookManager bookManager;
     private LoanManager loanManager;
     private MenuHandler menuHandler;
+    private EmployeeManager employeeManager;
 
     public LibrarySystem() {
         this.studentManager = new StudentManager();
@@ -16,6 +17,7 @@ public class LibrarySystem {
             this.loanManager = null;
         }
         this.menuHandler = new MenuHandler(this);
+        this.employeeManager = new EmployeeManager();
     }
 
     public int getStudentCount() {
@@ -78,6 +80,12 @@ public class LibrarySystem {
     public LoanManager getLoanManager() {
         return loanManager;
     }
+
+    public EmployeeManager getEmployeeManager() {
+        return employeeManager;
+    }
+
+
 
     public void start() {
         menuHandler.displayMainMenu();
