@@ -8,7 +8,18 @@ public class EmployeeManager {
 
     public EmployeeManager() {
         employees = new ArrayList<>();
+        employees.add(new Employee("Ali", "ali123", "1234"));
+        employees.add(new Employee("Sara", "sara", "abcd"));
         loadEmployees();
+    }
+
+    public void changePassword(Employee emp, String newPassword) {
+        emp.setPassword(newPassword);
+        System.out.println("Password changed successfully for employee: " + emp.getUsername());
+    }
+
+    public List<Employee> getEmployees() {
+        return employees;
     }
 
     public void addEmployee(Employee emp) {

@@ -217,6 +217,29 @@ public class MenuHandler {
         }
     }
 
+    private void handleChangeEmployeePassword(Employee emp) {
+        System.out.println("\n--- Change Password ---");
+        System.out.print("Enter your current password: ");
+        String current = scanner.nextLine();
+
+        if (!emp.getPassword().equals(current)) {
+            System.out.println("Incorrect current password. Try again.");
+            return;
+        }
+
+        System.out.print("Enter new password: ");
+        String newPass = scanner.nextLine();
+
+        System.out.print("Confirm new password: ");
+        String confirm = scanner.nextLine();
+
+        if (!newPass.equals(confirm)) {
+            System.out.println("Passwords do not match. Try again.");
+            return;
+        }
+
+        librarySystem.getEmployeeManager().changePassword(emp, newPass);
+    }
 
 
 }

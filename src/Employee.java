@@ -13,6 +13,10 @@ public class Employee {
     public String getUsername() { return username; }
     public String getPassword() { return password; }
 
+    public void setPassword(String newPassword) {
+        this.password = newPassword;
+    }
+
     @Override
     public String toString() {
         return "Name: " + name + " | Username: " + username;
