@@ -1,5 +1,7 @@
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class MenuHandler {
@@ -295,15 +297,53 @@ public class MenuHandler {
                         librarySystem.getStudentManager().toggleStudentStatusInteractive();
                         break;
                 case 6:
+                    handleBookReceival(employee);
+                    break;
+                case 7:
                     System.out.println("Logging out...");
                     break;
                 default:
                     System.out.println("Invalid choice.");
             }
-        } while (choice != 6);
+        } while (choice != 7);
     }
 
+    private void handleBookReceival(Employee employee) {
+        System.out.println("\n--- Receive Returned Book ---");
 
+        // نمایش کتاب‌های امانت داده شده
+        List<Book> allBooks = librarySystem.getBookManager().getAllBooks();
+        List<Book> borrowedBooks = new ArrayList<>();
+
+        for (Book book : allBooks) {
+            if (book.isBorrowed()) {
+                borrowedBooks.add(book);
+            }
+        }
+
+        if (borrowedBooks.isEmpty()) {
+            System.out.println("No borrowed books to receive.");
+            return;
+        }
+
+        System.out.println("Borrowed Books:");
+        for (int i = 0; i < borrowedBooks.size(); i++) {
+            System.out.println((i + 1) + ". " + borrowedBooks.get(i));
+        }
+
+        System.out.print("Select book number to mark as received: ");
+        int bookIndex = getIntInput(1, borrowedBooks.size()) - 1;
+        Book selectedBook = borrowedBooks.get(bookIndex);
+
+        // علامت‌گذاری کتاب به عنوان بازگشت داده شده
+        selectedBook.setBorrowed(false);
+        librarySystem.getBookManager().saveBooks();
+
+        // ثبت آمار در EmployeeManager
+        librarySystem.getEmployeeManager().recordBookReceived(employee);
+
+        System.out.println("Book received successfully!");
+    }
     private void handleAddNewBook(Employee emp) {
         System.out.println("\n=== Add New Book ===");
         System.out.print("Enter Book ID: ");
@@ -383,6 +423,8 @@ public class MenuHandler {
             System.out.println("1. Add Employee");
             System.out.println("2. View Employee Performance");
             System.out.println("3. Remove Employee");
+            System.out.println("4. View Loan Statistics");
+            System.out.println("5. View Student Statistics with Top 10 Delayed");
             System.out.println("0. Back");
             System.out.print("Choice: ");
             choice = Integer.parseInt(scanner.nextLine());
@@ -398,6 +440,13 @@ public class MenuHandler {
                     break;
                 case 3:
                     em.removeEmployeeInteractive(); // FPR_4-4
+                    break;
+
+                case 4:
+                    librarySystem.getLoanManager().displayLoanStatistics();
+                    break;
+                case 5:
+                    displayStudentStatisticsWithTopDelayed();
                     break;
                 case 0:
                     break;
@@ -456,4 +505,35 @@ public class MenuHandler {
         System.out.println("Book information updated successfully!");
     }
 
+    private void displayStudentStatisticsWithTopDelayed() {
+        System.out.println("\n--- Student Statistics with Top 10 Delayed ---");
+
+        // گرفتن آمار تاخیرها از LoanManager
+        Map<String, Integer> studentDelays = librarySystem.getLoanManager().getStudentsWithMostDelays();
+
+        // مرتب کردن بر اساس تعداد تاخیرها (نزولی)
+        List<Map.Entry<String, Integer>> sortedDelays = new ArrayList<>(studentDelays.entrySet());
+        sortedDelays.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+        // نمایش 10 دانشجوی اول با بیشترین تاخیر
+        int count = Math.min(10, sortedDelays.size());
+        System.out.println("Top " + count + " students with most delays:");
+
+        for (int i = 0; i < count; i++) {
+            Map.Entry<String, Integer> entry = sortedDelays.get(i);
+            String username = entry.getKey();
+            int delays = entry.getValue();
+
+            // پیدا کردن اطلاعات دانشجو
+            Student student = librarySystem.getStudentManager().findByUsername(username);
+            if (student != null) {
+                System.out.println((i + 1) + ". " + student.getName() + " (" + username + ") - Delays: " + delays);
+            } else {
+                System.out.println((i + 1) + ". " + username + " - Delays: " + delays);
+            }
+        }
+
+        // نمایش آمار کلی
+        System.out.println("\nTotal students with delays: " + studentDelays.size());
+    }
 }

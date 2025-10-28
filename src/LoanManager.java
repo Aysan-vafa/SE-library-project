@@ -24,7 +24,6 @@ public class LoanManager {
             return;
         }
 
-
         System.out.println("Available Books:");
         for (int i = 0; i < allBooks.size(); i++) {
             System.out.println((i + 1) + ". " + allBooks.get(i));
@@ -51,6 +50,7 @@ public class LoanManager {
         saveLoans();
         System.out.println("Loan request created successfully and is waiting for approval.");
     }
+
     public int getLoanCount() {
         return loans.size();
     }
@@ -113,7 +113,6 @@ public class LoanManager {
         return pending;
     }
 
-
     public void approveLoan(BookLoan loan) {
         loan.setStatus(BookLoan.LoanStatus.APPROVED);
 
@@ -131,9 +130,9 @@ public class LoanManager {
     }
 
     public void updateLoan(BookLoan loan) {
-
         saveLoans();
     }
+
     public List<BookLoan> getPendingLoansForApproval() {
         List<BookLoan> result = new ArrayList<>();
         LocalDate today = LocalDate.now();
@@ -179,4 +178,100 @@ public class LoanManager {
         saveLoans();
     }
 
+    // FPR_3-6: گزارش تاریخچه امانات یک دانشجو
+    public void displayStudentLoanHistory(String studentUsername) {
+        List<BookLoan> studentLoans = new ArrayList<>();
+        int totalLoans = 0;
+        int notReturnedCount = 0;
+        int delayedReturnCount = 0;
+
+        for (BookLoan loan : loans) {
+            if (loan.getStudentUsername().equals(studentUsername)) {
+                studentLoans.add(loan);
+                totalLoans++;
+
+                // منطق ساده برای تشخیص تحویل‌های با تاخیر
+                if (loan.getStatus() == BookLoan.LoanStatus.APPROVED) {
+                    notReturnedCount++;
+                    // بررسی تاخیر (فرض: اگر endDate گذشته باشد ولی هنوز APPROVED است = تاخیر)
+                    try {
+                        LocalDate endDate = LocalDate.parse(loan.getEndDate());
+                        if (LocalDate.now().isAfter(endDate)) {
+                            delayedReturnCount++;
+                        }
+                    } catch (Exception e) {
+                        // ignore date parsing errors
+                    }
+                }
+            }
+        }
+
+        System.out.println("\n--- Loan History for Student: " + studentUsername + " ---");
+        System.out.println("Total loans: " + totalLoans);
+        System.out.println("Not returned books: " + notReturnedCount);
+        System.out.println("Delayed returns: " + delayedReturnCount);
+
+        if (!studentLoans.isEmpty()) {
+            System.out.println("\nDetailed Loan History:");
+            for (BookLoan loan : studentLoans) {
+                System.out.println(loan);
+            }
+        }
+    }
+
+    // FPR_4-3: آمار امانات کتاب
+    public void displayLoanStatistics() {
+        int totalRequests = loans.size();
+        int approvedLoans = 0;
+        long totalDays = 0;
+        int countedLoans = 0;
+
+        for (BookLoan loan : loans) {
+            if (loan.getStatus() == BookLoan.LoanStatus.APPROVED) {
+                approvedLoans++;
+                try {
+                    LocalDate start = LocalDate.parse(loan.getStartDate());
+                    LocalDate end = LocalDate.parse(loan.getEndDate());
+                    long days = java.time.temporal.ChronoUnit.DAYS.between(start, end);
+                    totalDays += days;
+                    countedLoans++;
+                } catch (Exception e) {
+                    // ignore date parsing errors
+                }
+            }
+        }
+
+        double averageDays = countedLoans > 0 ? (double) totalDays / countedLoans : 0;
+
+        System.out.println("\n--- Loan Statistics ---");
+        System.out.println("Total loan requests: " + totalRequests);
+        System.out.println("Total approved loans: " + approvedLoans);
+        System.out.printf("Average loan duration: %.2f days%n", averageDays);
+    }
+
+    // متد جدید برای گرفتن لیست دانشجویان با بیشترین تاخیر
+    public Map<String, Integer> getStudentsWithMostDelays() {
+        Map<String, Integer> studentDelays = new HashMap<>();
+
+        for (BookLoan loan : loans) {
+            if (loan.getStatus() == BookLoan.LoanStatus.APPROVED) {
+                try {
+                    LocalDate endDate = LocalDate.parse(loan.getEndDate());
+                    if (LocalDate.now().isAfter(endDate)) {
+                        String username = loan.getStudentUsername();
+                        studentDelays.put(username, studentDelays.getOrDefault(username, 0) + 1);
+                    }
+                } catch (Exception e) {
+                    // ignore date parsing errors
+                }
+            }
+        }
+
+        return studentDelays;
+    }
+
+    // متد کمکی برای گرفتن همه وام‌ها
+    public List<BookLoan> getAllLoans() {
+        return new ArrayList<>(loans);
+    }
 }

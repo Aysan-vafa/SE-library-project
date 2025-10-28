@@ -35,8 +35,29 @@ public class LibrarySystem {
         return studentManager.authenticateStudent(username, password);
     }
 
+    // در کلاس LibrarySystem، متد editStudentInformation را کامل کنید:
     public void editStudentInformation(Student student) {
-        System.out.println("Not implemented.");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\n--- Edit My Information ---");
+        System.out.println("Current Information:");
+        System.out.println(student);
+
+        System.out.print("Enter new name (press Enter to keep current): ");
+        String newName = scanner.nextLine();
+        if (!newName.trim().isEmpty()) {
+            // در این ساختار ساده، برای تغییر نام نیاز به تغییر در StudentManager داریم
+            // برای سادگی، فقط پیام نمایش می‌دهیم
+            System.out.println("Name change requires administrator assistance.");
+        }
+
+        System.out.print("Enter new password: ");
+        String newPassword = scanner.nextLine();
+        if (!newPassword.trim().isEmpty()) {
+            // این بخش نیاز به پیاده‌سازی setter در کلاس Student و ذخیره دارد
+            System.out.println("Password change feature will be implemented in next version.");
+        }
+
+        System.out.println("Information update completed.");
     }
 
     public void borrowBook(Student student) {

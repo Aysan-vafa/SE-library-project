@@ -66,6 +66,9 @@ public class StudentManager {
                 .orElse(null);
     }
 
+    public List<Student> getAllStudents() {
+        return new ArrayList<>(students);
+    }
     public void saveStudents() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
             for (Student s : students) {
