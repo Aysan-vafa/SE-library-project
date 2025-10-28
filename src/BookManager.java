@@ -47,6 +47,18 @@ public class BookManager {
         return results;
     }
 
+    public boolean addBook(String id, String title, String author, int year) {
+        for (Book book : books) {
+            if (book.getId().equalsIgnoreCase(id)) {
+                return false;
+            }
+        }
+        Book newBook = new Book(id, title, author, year, true);
+        books.add(newBook);
+        saveBooks();
+        return true;
+    }
+
     public List<Book> getAllBooks() {
         return books;
     }

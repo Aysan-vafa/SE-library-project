@@ -211,7 +211,7 @@ public class MenuHandler {
         Employee emp = librarySystem.getEmployeeManager().authenticate(username, password);
         if (emp != null) {
             System.out.println("Login successful! Welcome, " + emp.getName());
-            displayEmployeeMenu(emp);
+            showEmployeeMenu(emp);
         } else {
             System.out.println("Invalid username or password.");
         }
@@ -241,5 +241,57 @@ public class MenuHandler {
         librarySystem.getEmployeeManager().changePassword(emp, newPass);
     }
 
+    private void showEmployeeMenu(Employee employee) {
+        int choice;
+        do {
+            System.out.println("\n===== Employee Menu =====");
+            System.out.println("1. Change Password");
+            System.out.println("2. Add New Book");
+            System.out.println("3. Approve Loan Requests");
+            System.out.println("4. Logout");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    handleChangeEmployeePassword(employee);
+                    break;
+                case 2:
+                    handleAddNewBook();
+                    break;
+                case 3:
+                    handleLoanApprovalMenu(employee);
+                    break;
+                case 4:
+                    System.out.println("Logging out...");
+                    break;
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        } while (choice != 4);
+    }
+
+    private void handleAddNewBook() {
+        System.out.println("\n=== Add New Book ===");
+        System.out.print("Enter Book ID: ");
+        String id = scanner.nextLine();
+        System.out.print("Enter Title: ");
+        String title = scanner.nextLine();
+        System.out.print("Enter Author: ");
+        String author = scanner.nextLine();
+        System.out.print("Enter Publication Year: ");
+        int year = scanner.nextInt();
+        scanner.nextLine();
+
+        boolean success = librarySystem.getBookManager().addBook(id, title, author, year);
+
+
+        if (success) {
+            System.out.println("✅ Book added successfully!");
+        } else {
+            System.out.println("⚠️ Book with this ID already exists!");
+        }
+    }
 
 }
