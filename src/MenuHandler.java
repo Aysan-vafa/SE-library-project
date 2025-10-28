@@ -247,25 +247,24 @@ public class MenuHandler {
             System.out.println("\n===== Employee Menu =====");
             System.out.println("1. Change Password");
             System.out.println("2. Add New Book");
-            System.out.println("3. Edit Book Information"); // 🆕 جدید
-            System.out.println("4. Approve Loan Requests");
+            System.out.println("3. Edit Book Information");
+            System.out.println("4. Approve Loan Requests (only today or yesterday)");
             System.out.println("5. Logout");
             System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
-            scanner.nextLine();
+            choice = Integer.parseInt(scanner.nextLine());
 
             switch (choice) {
                 case 1:
                     handleChangeEmployeePassword(employee);
                     break;
                 case 2:
-                    handleAddNewBook();
+                    handleAddNewBook(employee); // pass employee for stats
                     break;
                 case 3:
                     handleEditBook();
                     break;
                 case 4:
-                    handleLoanApprovalMenu(employee);
+                    handleLoanApprovalMenu(employee); // pass employee so we can increment stats
                     break;
                 case 5:
                     System.out.println("Logging out...");
@@ -277,7 +276,7 @@ public class MenuHandler {
     }
 
 
-    private void handleAddNewBook() {
+    private void handleAddNewBook(Employee emp) {
         System.out.println("\n=== Add New Book ===");
         System.out.print("Enter Book ID: ");
         String id = scanner.nextLine();
@@ -286,61 +285,67 @@ public class MenuHandler {
         System.out.print("Enter Author: ");
         String author = scanner.nextLine();
         System.out.print("Enter Publication Year: ");
-        int year = scanner.nextInt();
-        scanner.nextLine();
+        int year = Integer.parseInt(scanner.nextLine());
 
         boolean success = librarySystem.getBookManager().addBook(id, title, author, year);
 
-
         if (success) {
+            // ثبت آمار در EmployeeManager
+            librarySystem.getEmployeeManager().recordBookAdded(emp);
             System.out.println("✅ Book added successfully!");
         } else {
             System.out.println("⚠️ Book with this ID already exists!");
         }
     }
-    private void handleEditBook() {
-        System.out.println("\n=== Edit Book Information ===");
-        System.out.print("Enter Book ID to edit: ");
-        String id = scanner.nextLine();
-
-        BookManager bookManager = librarySystem.getBookManager();
-        Book book = bookManager.findBookById(id);
-
-        if (book == null) {
-            System.out.println("❌ No book found with this ID.");
+    private void handleLoanApprovalMenu(Employee employee) {
+        LoanManager loanManager = librarySystem.getLoanManager();
+        if (loanManager == null) {
+            System.out.println("Loan functionality is not available.");
             return;
         }
 
-        System.out.println("\nCurrent Book Information:");
-        System.out.println(book);
+        List<BookLoan> pendingLoans = loanManager.getPendingLoansForApproval(); // <-- تغییر شده
 
-        System.out.print("New Title (press Enter to keep current): ");
-        String newTitle = scanner.nextLine();
-        if (newTitle.isEmpty()) newTitle = book.getTitle();
-
-        System.out.print("New Author (press Enter to keep current): ");
-        String newAuthor = scanner.nextLine();
-        if (newAuthor.isEmpty()) newAuthor = book.getAuthor();
-
-        System.out.print("New Publication Year (press Enter to keep current): ");
-        String yearInput = scanner.nextLine();
-        int newYear = book.getPublishYear();
-        if (!yearInput.isEmpty()) {
-            try {
-                newYear = Integer.parseInt(yearInput);
-            } catch (NumberFormatException e) {
-                System.out.println("⚠️ Invalid year entered, keeping old value.");
-            }
+        if (pendingLoans.isEmpty()) {
+            System.out.println("No pending loan requests for today or yesterday.");
+            return;
         }
 
-        boolean success = bookManager.editBook(id, newTitle, newAuthor, newYear);
+        System.out.println("\n--- Pending Loan Requests (today or yesterday) ---");
+        for (int i = 0; i < pendingLoans.size(); i++) {
+            BookLoan loan = pendingLoans.get(i);
+            System.out.printf("%d. LoanID: %s | Student: %s | BookID: %s | From: %s | To: %s | Status: %s%n",
+                    i + 1,
+                    loan.getLoanId(),
+                    loan.getStudentUsername(),
+                    loan.getBookId(),
+                    loan.getStartDate(),
+                    loan.getEndDate(),
+                    loan.getStatus()
+            );
+        }
 
-        if (success) {
-            System.out.println("✅ Book information updated successfully!");
+        System.out.print("\nEnter the number of the loan to approve/reject (0 to cancel): ");
+        int choice = getIntInput(0, pendingLoans.size());
+
+        if (choice == 0) return;
+
+        BookLoan selectedLoan = pendingLoans.get(choice - 1);
+
+        System.out.print("Approve or Reject? (A/R): ");
+        String action = scanner.nextLine().trim().toUpperCase();
+
+        if (action.equals("A")) {
+            loanManager.approveLoan(selectedLoan);
+            // ثبت آمار تایید در EmployeeManager
+            librarySystem.getEmployeeManager().recordLoanApproved(employee);
+            System.out.println("Loan approved successfully!");
+        } else if (action.equals("R")) {
+            loanManager.rejectLoan(selectedLoan);
+            System.out.println("Loan rejected successfully!");
         } else {
-            System.out.println("⚠️ Failed to update book information.");
+            System.out.println("Invalid option, action canceled.");
         }
     }
-
 
 }

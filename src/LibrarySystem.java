@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class LibrarySystem {
     private StudentManager studentManager;
@@ -44,9 +47,56 @@ public class LibrarySystem {
         }
     }
 
+    // LibrarySystem
     public void returnBook(Student student) {
-        System.out.println("Not implemented.");
+        if (loanManager == null) {
+            System.out.println("Loan functionality not available.");
+            return;
+        }
+
+
+        List<BookLoan> activeLoans = new ArrayList<>();
+        for (BookLoan loan : loanManager.getPendingLoans()) {
+            if (loan.getStudentUsername().equals(student.getUsername()) && loan.isApproved()) {
+                activeLoans.add(loan);
+            }
+        }
+
+        if (activeLoans.isEmpty()) {
+            System.out.println("You have no active loans to return.");
+            return;
+        }
+
+        System.out.println("\n--- Your Active Loans ---");
+        for (int i = 0; i < activeLoans.size(); i++) {
+            BookLoan loan = activeLoans.get(i);
+            System.out.printf("%d. BookID: %s | From: %s | To: %s%n",
+                    i + 1, loan.getBookId(), loan.getStartDate(), loan.getEndDate());
+        }
+
+        System.out.print("Enter the number of the loan to return: ");
+        int choice = new Scanner(System.in).nextInt() - 1;
+
+        if (choice < 0 || choice >= activeLoans.size()) {
+            System.out.println("Invalid selection.");
+            return;
+        }
+
+        BookLoan selectedLoan = activeLoans.get(choice);
+
+
+        Book book = bookManager.findBookById(selectedLoan.getBookId());
+        if (book != null) {
+            book.setBorrowed(false);
+        }
+
+
+        selectedLoan.setStatus(BookLoan.LoanStatus.REJECTED); // می‌تونیم از REJECTED استفاده کنیم یا یک فیلد returned اضافه کنیم
+        loanManager.saveLoans();
+
+        System.out.println("Book returned successfully!");
     }
+
 
     public void displayAvailableBooks() {
         System.out.println("\n--- All Books ---");

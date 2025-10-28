@@ -13,7 +13,30 @@ public class BookLoan {
         this.startDate = startDate;
         this.endDate = endDate;
         this.approved = approved;
+
+        if (approved) {
+            this.status = LoanStatus.APPROVED;
+        } else {
+            this.status = LoanStatus.PENDING;
+        }
     }
+
+    public enum LoanStatus {
+        PENDING,
+        APPROVED,
+        REJECTED
+    }
+
+    private LoanStatus status;
+
+    public LoanStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(LoanStatus status) {
+        this.status = status;
+    }
+
 
     public String getLoanId() {
         return loanId;
@@ -36,8 +59,9 @@ public class BookLoan {
     }
 
     public boolean isApproved() {
-        return approved;
+        return status == LoanStatus.APPROVED;
     }
+
 
     public void setApproved(boolean approved) {
         this.approved = approved;

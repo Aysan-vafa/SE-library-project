@@ -79,7 +79,7 @@ public class LoanManager {
         }
     }
 
-    private void saveLoans() {
+    public void saveLoans() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(LOAN_FILE))) {
             for (BookLoan loan : loans) {
                 pw.println(loan.toFileString());
@@ -102,4 +102,67 @@ public class LoanManager {
             }
         }
     }
+
+    public List<BookLoan> getPendingLoans() {
+        List<BookLoan> pending = new ArrayList<>();
+        for (BookLoan loan : loans) {
+            if (loan.getStatus() == BookLoan.LoanStatus.PENDING) {
+                pending.add(loan);
+            }
+        }
+        return pending;
+    }
+
+
+    public void approveLoan(BookLoan loan) {
+        loan.setStatus(BookLoan.LoanStatus.APPROVED);
+
+        Book book = bookManager.findBookById(loan.getBookId());
+        if (book != null) {
+            book.setBorrowed(true);
+        }
+
+        saveLoans();
+    }
+
+    public void rejectLoan(BookLoan loan) {
+        loan.setStatus(BookLoan.LoanStatus.REJECTED);
+        saveLoans();
+    }
+
+    public void updateLoan(BookLoan loan) {
+
+        saveLoans();
+    }
+    public List<BookLoan> getPendingLoansForApproval() {
+        List<BookLoan> result = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+
+        for (BookLoan loan : loans) {
+            if (loan.getStatus() == BookLoan.LoanStatus.PENDING) {
+                try {
+                    LocalDate start = LocalDate.parse(loan.getStartDate());
+                    if (start.equals(today) || start.equals(yesterday)) {
+                        result.add(loan);
+                    }
+                } catch (Exception e) {
+                    // اگر فرمت تاریخ درست نیست، از آن رد می‌شویم
+                }
+            }
+        }
+        return result;
+    }
+
+    // FPR_3-6: گرفتن امانت‌های تاییدشده (فعال) متعلق به یک دانشجو
+    public List<BookLoan> getApprovedLoansForStudent(String studentUsername) {
+        List<BookLoan> result = new ArrayList<>();
+        for (BookLoan loan : loans) {
+            if (loan.getStudentUsername().equals(studentUsername) && loan.getStatus() == BookLoan.LoanStatus.APPROVED) {
+                result.add(loan);
+            }
+        }
+        return result;
+    }
+
 }

@@ -61,5 +61,23 @@ public class EmployeeManager {
             System.out.println("Error loading employees: " + ex.getMessage());
         }
     }
+    public void recordBookAdded(Employee emp) {
+        if (emp == null) return;
+        emp.incBooksAdded();
+        saveEmployees();
+    }
+
+    public void recordLoanApproved(Employee emp) {
+        if (emp == null) return;
+        emp.incLoansApproved();
+        saveEmployees();
+    }
+
+    public void recordBookReceived(Employee emp) {
+        if (emp == null) return;
+        emp.incBooksReceived();
+        saveEmployees();
+    }
+
 }
 
