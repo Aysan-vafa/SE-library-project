@@ -94,7 +94,14 @@ public class EmployeeManager {
         saveEmployees();
         System.out.println("Employee added successfully.");
     }
-
+    // نمایش عملکرد ساده (FPR_4-2)
+    public void printEmployeePerformance() {
+        System.out.println("\n--- Employee Performance ---");
+        for (Employee e : employees) {
+            System.out.printf("Username: %s | Name: %s | booksAdded: %d | loansApproved: %d | booksReceived: %d%n",
+                    e.getUsername(), e.getName(), e.getBooksAdded(), e.getLoansApproved(), e.getBooksReceived());
+        }
+    }
 
 }
 
