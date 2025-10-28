@@ -351,5 +351,37 @@ public class MenuHandler {
             System.out.println("Invalid option, action canceled.");
         }
     }
+    // FPR_4-1 .. FPR_4-4: منوی مدیر سیستم
+    public void handleAdminMenu() {
+        int choice;
+        do {
+            System.out.println("\n--- Admin Menu ---");
+            System.out.println("1. Add Employee");
+            System.out.println("2. View Employee Performance");
+            System.out.println("3. Remove Employee");
+            System.out.println("0. Back");
+            System.out.print("Choice: ");
+            choice = Integer.parseInt(scanner.nextLine());
+
+            EmployeeManager em = librarySystem.getEmployeeManager();
+
+            switch (choice) {
+                case 1:
+                    em.addEmployeeInteractive(); // FPR_4-1
+                    break;
+                case 2:
+                    em.printEmployeePerformance(); // FPR_4-2
+                    break;
+                case 3:
+                    em.removeEmployeeInteractive(); // FPR_4-4
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        } while (choice != 0);
+    }
+
 
 }

@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class EmployeeManager {
     private List<Employee> employees;
@@ -78,6 +79,22 @@ public class EmployeeManager {
         emp.incBooksReceived();
         saveEmployees();
     }
+    public void addEmployeeInteractive() { // FPR_4-1
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\n--- Add New Employee ---");
+        System.out.print("Name: ");
+        String name = sc.nextLine();
+        System.out.print("Username: ");
+        String username = sc.nextLine();
+        System.out.print("Password: ");
+        String password = sc.nextLine();
+
+        Employee emp = new Employee(name, username, password);
+        employees.add(emp);
+        saveEmployees();
+        System.out.println("Employee added successfully.");
+    }
+
 
 }
 
