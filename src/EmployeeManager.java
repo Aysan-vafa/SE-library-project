@@ -102,6 +102,18 @@ public class EmployeeManager {
                     e.getUsername(), e.getName(), e.getBooksAdded(), e.getLoansApproved(), e.getBooksReceived());
         }
     }
+    public void removeEmployeeInteractive() { // FPR_4-4
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter employee username to remove: ");
+        String username = sc.nextLine();
+        boolean removed = employees.removeIf(e -> e.getUsername().equals(username));
+        if (removed) {
+            saveEmployees();
+            System.out.println("Employee removed.");
+        } else {
+            System.out.println("Employee not found.");
+        }
+    }
 
 }
 

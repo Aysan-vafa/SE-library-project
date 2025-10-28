@@ -18,11 +18,14 @@ public class MenuHandler {
             System.out.println("\n=== University Library Management System ===");
             System.out.println("1. Student Registration");
             System.out.println("2. Student Login");
-            System.out.println("3. View Registered Student Count");
-            System.out.println("4. Exit");
+            System.out.println("3. Employee Login");
+            System.out.println("4. Admin Login");
+            System.out.println("5. Guest Menu");
+            System.out.println("6. View Registered Student Count");
+            System.out.println("7. Exit");
             System.out.print("Please enter your choice: ");
 
-            int choice = getIntInput(1, 4);
+            int choice = getIntInput(1, 7);
 
             switch (choice) {
                 case 1:
@@ -32,15 +35,36 @@ public class MenuHandler {
                     handleStudentLogin();
                     break;
                 case 3:
-                    displayStudentCount();
+                    handleEmployeeLogin();
                     break;
                 case 4:
+                    handleAdminLogin();
+                    break;
+                case 5:
+                    displayGuestMenu();
+                    break;
+                case 6:
+                    displayStudentCount();
+                    break;
+                case 7:
                     System.out.println("Exiting system. Goodbye!");
                     return;
                 default:
                     System.out.println("Invalid option! Please try again.");
             }
             System.out.println("___________________________");
+        }
+    }
+    private void handleAdminLogin() {
+        System.out.println("\n--- Admin Login ---");
+        System.out.print("Enter admin password: ");
+        String password = scanner.nextLine();
+
+        // پسورد ساده برای ادمین - در حالت واقعی باید امن‌تر باشد
+        if ("admin123".equals(password)) {
+            handleAdminMenu();
+        } else {
+            System.out.println("Invalid admin password!");
         }
     }
 
@@ -382,6 +406,54 @@ public class MenuHandler {
             }
         } while (choice != 0);
     }
+    // در کلاس MenuHandler اضافه کنید:
+    private void handleEditBook() {
+        System.out.println("\n--- Edit Book Information ---");
 
+        // نمایش همه کتاب‌ها
+        List<Book> allBooks = librarySystem.getBookManager().getAllBooks();
+        if (allBooks.isEmpty()) {
+            System.out.println("No books available to edit.");
+            return;
+        }
+
+        System.out.println("Available Books:");
+        for (int i = 0; i < allBooks.size(); i++) {
+            System.out.println((i + 1) + ". " + allBooks.get(i));
+        }
+
+        System.out.print("Select book number to edit: ");
+        int bookIndex = getIntInput(1, allBooks.size()) - 1;
+        Book selectedBook = allBooks.get(bookIndex);
+
+        System.out.println("\nCurrent Information:");
+        System.out.println(selectedBook);
+
+        System.out.print("Enter new title (press Enter to keep current): ");
+        String newTitle = scanner.nextLine();
+        if (!newTitle.trim().isEmpty()) {
+            selectedBook.setTitle(newTitle);
+        }
+
+        System.out.print("Enter new author (press Enter to keep current): ");
+        String newAuthor = scanner.nextLine();
+        if (!newAuthor.trim().isEmpty()) {
+            selectedBook.setAuthor(newAuthor);
+        }
+
+        System.out.print("Enter new publish year (press Enter to keep current): ");
+        String yearInput = scanner.nextLine();
+        if (!yearInput.trim().isEmpty()) {
+            try {
+                int newYear = Integer.parseInt(yearInput);
+                selectedBook.setYear(newYear);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid year format. Keeping current year.");
+            }
+        }
+
+        librarySystem.getBookManager().saveBooks();
+        System.out.println("Book information updated successfully!");
+    }
 
 }
