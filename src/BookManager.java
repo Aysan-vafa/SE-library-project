@@ -102,4 +102,26 @@ public class BookManager {
         // just persist to disk
         saveBooks();
     }
+
+    public Book findBookById(String id) {
+        for (Book book : books) {
+            if (book.getId().equalsIgnoreCase(id)) {
+                return book;
+            }
+        }
+        return null;
+    }
+
+    public boolean editBook(String id, String newTitle, String newAuthor, int newYear) {
+        Book book = findBookById(id);
+        if (book != null) {
+            book.setTitle(newTitle);
+            book.setAuthor(newAuthor);
+            book.setYear(newYear);
+            saveBooks();
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -247,8 +247,9 @@ public class MenuHandler {
             System.out.println("\n===== Employee Menu =====");
             System.out.println("1. Change Password");
             System.out.println("2. Add New Book");
-            System.out.println("3. Approve Loan Requests");
-            System.out.println("4. Logout");
+            System.out.println("3. Edit Book Information"); // 🆕 جدید
+            System.out.println("4. Approve Loan Requests");
+            System.out.println("5. Logout");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
             scanner.nextLine();
@@ -261,16 +262,20 @@ public class MenuHandler {
                     handleAddNewBook();
                     break;
                 case 3:
-                    handleLoanApprovalMenu(employee);
+                    handleEditBook();
                     break;
                 case 4:
+                    handleLoanApprovalMenu(employee);
+                    break;
+                case 5:
                     System.out.println("Logging out...");
                     break;
                 default:
                     System.out.println("Invalid choice.");
             }
-        } while (choice != 4);
+        } while (choice != 5);
     }
+
 
     private void handleAddNewBook() {
         System.out.println("\n=== Add New Book ===");
@@ -293,5 +298,49 @@ public class MenuHandler {
             System.out.println("⚠️ Book with this ID already exists!");
         }
     }
+    private void handleEditBook() {
+        System.out.println("\n=== Edit Book Information ===");
+        System.out.print("Enter Book ID to edit: ");
+        String id = scanner.nextLine();
+
+        BookManager bookManager = librarySystem.getBookManager();
+        Book book = bookManager.findBookById(id);
+
+        if (book == null) {
+            System.out.println("❌ No book found with this ID.");
+            return;
+        }
+
+        System.out.println("\nCurrent Book Information:");
+        System.out.println(book);
+
+        System.out.print("New Title (press Enter to keep current): ");
+        String newTitle = scanner.nextLine();
+        if (newTitle.isEmpty()) newTitle = book.getTitle();
+
+        System.out.print("New Author (press Enter to keep current): ");
+        String newAuthor = scanner.nextLine();
+        if (newAuthor.isEmpty()) newAuthor = book.getAuthor();
+
+        System.out.print("New Publication Year (press Enter to keep current): ");
+        String yearInput = scanner.nextLine();
+        int newYear = book.getPublishYear();
+        if (!yearInput.isEmpty()) {
+            try {
+                newYear = Integer.parseInt(yearInput);
+            } catch (NumberFormatException e) {
+                System.out.println("⚠️ Invalid year entered, keeping old value.");
+            }
+        }
+
+        boolean success = bookManager.editBook(id, newTitle, newAuthor, newYear);
+
+        if (success) {
+            System.out.println("✅ Book information updated successfully!");
+        } else {
+            System.out.println("⚠️ Failed to update book information.");
+        }
+    }
+
 
 }
