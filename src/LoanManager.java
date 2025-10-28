@@ -165,4 +165,18 @@ public class LoanManager {
         return result;
     }
 
+    // FPR_3-8: علامت‌گذاری بازگشت کتاب
+    public void markLoanReturned(BookLoan loan) {
+        if (loan == null) return;
+        // برای سادگی: وقتی کتاب برگشت، وضعیت را REJECTED قرار می‌دهیم (در ساختار فعلی رمزخورده)
+        loan.setStatus(BookLoan.LoanStatus.REJECTED);
+        // کتاب را در BookManager آزاد کن
+        Book book = bookManager.findBookById(loan.getBookId());
+        if (book != null) {
+            book.setBorrowed(false);
+            bookManager.saveBooks();
+        }
+        saveLoans();
+    }
+
 }

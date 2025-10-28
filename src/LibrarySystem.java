@@ -48,19 +48,14 @@ public class LibrarySystem {
     }
 
     // LibrarySystem
+    // FPR_3-8: بازگرداندن کتاب توسط دانشجو (اصلاح‌شده)
     public void returnBook(Student student) {
         if (loanManager == null) {
             System.out.println("Loan functionality not available.");
             return;
         }
 
-
-        List<BookLoan> activeLoans = new ArrayList<>();
-        for (BookLoan loan : loanManager.getPendingLoans()) {
-            if (loan.getStudentUsername().equals(student.getUsername()) && loan.isApproved()) {
-                activeLoans.add(loan);
-            }
-        }
+        List<BookLoan> activeLoans = loanManager.getApprovedLoansForStudent(student.getUsername());
 
         if (activeLoans.isEmpty()) {
             System.out.println("You have no active loans to return.");
@@ -70,12 +65,18 @@ public class LibrarySystem {
         System.out.println("\n--- Your Active Loans ---");
         for (int i = 0; i < activeLoans.size(); i++) {
             BookLoan loan = activeLoans.get(i);
-            System.out.printf("%d. BookID: %s | From: %s | To: %s%n",
-                    i + 1, loan.getBookId(), loan.getStartDate(), loan.getEndDate());
+            System.out.printf("%d. LoanID: %s | BookID: %s | From: %s | To: %s%n",
+                    i + 1, loan.getLoanId(), loan.getBookId(), loan.getStartDate(), loan.getEndDate());
         }
 
-        System.out.print("Enter the number of the loan to return: ");
-        int choice = new Scanner(System.in).nextInt() - 1;
+        System.out.print("Enter the number of the loan to mark as returned: ");
+        int choice;
+        try {
+            choice = Integer.parseInt(new Scanner(System.in).nextLine()) - 1;
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input.");
+            return;
+        }
 
         if (choice < 0 || choice >= activeLoans.size()) {
             System.out.println("Invalid selection.");
@@ -84,16 +85,8 @@ public class LibrarySystem {
 
         BookLoan selectedLoan = activeLoans.get(choice);
 
-
-        Book book = bookManager.findBookById(selectedLoan.getBookId());
-        if (book != null) {
-            book.setBorrowed(false);
-        }
-
-
-        selectedLoan.setStatus(BookLoan.LoanStatus.REJECTED); // می‌تونیم از REJECTED استفاده کنیم یا یک فیلد returned اضافه کنیم
-        loanManager.saveLoans();
-
+        // علامت‌گذاری بازگشت در LoanManager
+        loanManager.markLoanReturned(selectedLoan);
         System.out.println("Book returned successfully!");
     }
 
