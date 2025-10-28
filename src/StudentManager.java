@@ -2,6 +2,7 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class StudentManager {
     private List<Student> students;
@@ -94,4 +95,19 @@ public class StudentManager {
             System.out.println("Error loading students: " + e.getMessage());
         }
     }
+    // FPR_3-7: interactive toggle student active status
+    public void toggleStudentStatusInteractive() {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter student's username to toggle status: ");
+        String username = sc.nextLine();
+        Student s = findByUsername(username);
+        if (s == null) {
+            System.out.println("Student not found.");
+            return;
+        }
+        s.setActive(!s.isActive());
+        saveStudents();
+        System.out.println("Student " + username + " active status is now: " + (s.isActive() ? "active" : "inactive"));
+    }
+
 }

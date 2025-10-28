@@ -249,7 +249,8 @@ public class MenuHandler {
             System.out.println("2. Add New Book");
             System.out.println("3. Edit Book Information");
             System.out.println("4. Approve Loan Requests (only today or yesterday)");
-            System.out.println("5. Logout");
+            System.out.println("5. Toggle Student Active/Inactive");
+            System.out.println("6. Logout");
             System.out.print("Enter your choice: ");
             choice = Integer.parseInt(scanner.nextLine());
 
@@ -266,7 +267,10 @@ public class MenuHandler {
                 case 4:
                     handleLoanApprovalMenu(employee); // pass employee so we can increment stats
                     break;
-                case 5:
+                    case 5:
+                        librarySystem.getStudentManager().toggleStudentStatusInteractive();
+                        break;
+                case 6:
                     System.out.println("Logging out...");
                     break;
                 default:
